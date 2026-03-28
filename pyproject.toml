@@ -1,0 +1,30 @@
+[project]
+name = "braum-core"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Matheus Braum",email = "mtbraum@gmail.com"}
+]
+readme = "README.md"
+requires-python = "^3.10"
+dependencies = [
+    "fastapi (>=0.135.2,<0.136.0)",
+    "uvicorn[standard] (>=0.42.0,<0.43.0)",
+    "motor (>=3.7.1,<4.0.0)",
+    "pydantic-settings (>=2.13.1,<3.0.0)",
+    "validators (>=0.35.0,<0.36.0)",
+    "gunicorn (>=25.3.0,<26.0.0)",
+    "python-jose (>=3.5.0,<4.0.0)",
+    "alembic (>=1.18.4,<2.0.0)",
+    "sqlalchemy (>=2.0.48,<3.0.0)",
+    "psycopg (>=3.3.3,<4.0.0)",
+    "python-multipart (>=0.0.22,<0.0.23)"
+]
+
+[tool.poetry]
+package-mode = false
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

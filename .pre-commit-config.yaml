@@ -1,0 +1,23 @@
+repos:
+  - repo: https://github.com/psf/black-pre-commit-mirror
+    rev: 24.4.0
+    hooks:
+      - id: black
+        exclude: plib/psqa/models.py$
+        files: \.py$
+        language_version: python3.10
+        args:
+          - "--line-length=99"
+      - id: black
+        files: plib/psqa/models.py$
+        language_version: python3.10
+        args:
+          - "--line-length=9999"
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args:
+          - "--filter-files"
+          - "--profile=black"
+          - "--line-length=99"
