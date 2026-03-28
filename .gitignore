@@ -1,0 +1,95 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribuição / build
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Ambientes virtuais
+.venv/
+venv/
+env/
+ENV/
+
+# Ferramentas de teste / cobertura
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.hypothesis/
+.tox/
+.nox/
+
+# Tipagem e lint
+.mypy_cache/
+.ruff_cache/
+.pyre/
+
+# =========================
+# Poetry
+# =========================
+# Mantemos o lock em versionamento
+# poetry.lock
+
+# =========================
+# FastAPI / Uvicorn / Gunicorn
+# =========================
+*.pid
+*.pid.lock
+*.log
+
+# =========================
+# Alembic
+# =========================
+# Não ignorar migrations versionadas
+# alembic/versions/
+
+# =========================
+# Ambiente / segredos
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# IDE / Editor
+# =========================
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.iml
+
+# =========================
+# Sistema operacional
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Docker
+# =========================
+docker-data/
+
+# =========================
+# Banco local / artefatos runtime
+# =========================
+*.sqlite
+*.sqlite3
+*.db
+
+# =========================
+# Arquivos temporários
+# =========================
+*.tmp
+*.swp
+*.swo
+*~
