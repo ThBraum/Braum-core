@@ -1,0 +1,43 @@
+.app {
+    height: 100%;
+    display: grid;
+    grid-template-columns: 286px 1fr;
+}
+
+.main {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    overflow: hidden;
+}
+
+.workspace {
+    flex: 1;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    overflow: hidden;
+}
+
+.topbar {
+    min-height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+}
+
+.topbar-title {
+    font-size: 18px;
+    color: #d7e3f8;
+    font-weight: 600;
+}
+
+@media (max-width: 1040px) {
+    .app {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        display: none;
+    }
+}

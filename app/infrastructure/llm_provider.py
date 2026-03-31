@@ -4,7 +4,10 @@ import re
 import unicodedata
 
 from app.core.config import get_settings
-from app.infrastructure.realtime_knowledge_provider import RealtimeKnowledge, RealtimeKnowledgeProvider
+from app.infrastructure.realtime_knowledge_provider import (
+    RealtimeKnowledge,
+    RealtimeKnowledgeProvider,
+)
 
 
 class LLMProvider:
@@ -71,11 +74,15 @@ class LLMProvider:
         normalized_question = self._normalize(question)
         inferred_intent = self._infer_intent(normalized_question)
 
-        realtime_query = self._build_realtime_query(question, normalized_question, conversation_history)
+        realtime_query = self._build_realtime_query(
+            question, normalized_question, conversation_history
+        )
         if self._should_use_realtime(normalized_question, inferred_intent):
             realtime_knowledge = self.knowledge_provider.lookup(realtime_query)
             if realtime_knowledge is not None:
-                return self._render_realtime_answer(realtime_knowledge, inferred_intent, normalized_question)
+                return self._render_realtime_answer(
+                    realtime_knowledge, inferred_intent, normalized_question
+                )
 
         topic_answer = self._answer_by_topic(normalized_question)
         if topic_answer:
@@ -95,7 +102,9 @@ class LLMProvider:
         if any(marker in stripped for marker in self.RECENCY_MARKERS):
             return True
 
-        if inferred_intent == "fact" and any(token in stripped for token in self.FACTS_THAT_CHANGE):
+        if inferred_intent == "fact" and any(
+            token in stripped for token in self.FACTS_THAT_CHANGE
+        ):
             return True
 
         return False
@@ -115,7 +124,10 @@ class LLMProvider:
 
         if inferred_intent == "fact":
             years = self._extract_years(knowledge.summary)
-            if any(token in normalized_question for token in {"em que ano", "que ano", "quando"}) and years:
+            if (
+                any(token in normalized_question for token in {"em que ano", "que ano", "quando"})
+                and years
+            ):
                 return (
                     f"Com base nas fontes consultadas, a resposta mais provável é: {years[0]}.\n\n"
                     f"Fontes:\n{sources_text}\n"
@@ -128,7 +140,11 @@ class LLMProvider:
                 f"Atualizado em: {timestamp}"
             )
 
-        bullet_points = "\n".join(f"- {point}" for point in key_points) if key_points else "- Sem pontos adicionais."
+        bullet_points = (
+            "\n".join(f"- {point}" for point in key_points)
+            if key_points
+            else "- Sem pontos adicionais."
+        )
         return (
             f"Com base nas fontes consultadas, encontrei:\n\n"
             f"Resumo: {knowledge.summary}\n\n"
@@ -136,12 +152,10 @@ class LLMProvider:
             f"Fontes:\n{sources_text}\n"
             f"Atualizado em: {timestamp}"
         )
-        
+
     def answer_with_context(self, question: str, context_text: str) -> str:
         if not context_text.strip():
-            return (
-                "Não encontrei contexto suficiente nos documentos para responder com segurança."
-            )
+            return "Não encontrei contexto suficiente nos documentos para responder com segurança."
 
         return (
             "Responda usando apenas o contexto abaixo. "
@@ -170,20 +184,21 @@ class LLMProvider:
         if inferred_intent == "summary":
             return f"Resumo de '{inferred_topic}': conceito central, pontos essenciais e aplicação prática."
         if inferred_intent == "deepen":
-            return f"Vamos aprofundar '{inferred_topic}': fundamentos, funcionamento e casos de uso."
+            return (
+                f"Vamos aprofundar '{inferred_topic}': fundamentos, funcionamento e casos de uso."
+            )
         return f"Posso te explicar '{inferred_topic}' de forma direta: o que é, como funciona e onde isso aparece."
 
     def _answer_by_topic(self, normalized_question: str) -> str | None:
-        if "leis de newton" in normalized_question or ("newton" in normalized_question and "lei" in normalized_question):
-            return (
-                "As 3 Leis de Newton são:\n"
-                "1) Inércia.\n"
-                "2) F = m·a.\n"
-                "3) Ação e reação."
-            )
+        if "leis de newton" in normalized_question or (
+            "newton" in normalized_question and "lei" in normalized_question
+        ):
+            return "As 3 Leis de Newton são:\n" "1) Inércia.\n" "2) F = m·a.\n" "3) Ação e reação."
         return None
 
-    def _infer_topic(self, normalized_question: str, conversation_history: list[str] | None = None) -> str:
+    def _infer_topic(
+        self, normalized_question: str, conversation_history: list[str] | None = None
+    ) -> str:
         if self._is_follow_up(normalized_question):
             topic_from_history = self._infer_topic_from_history(conversation_history)
             if topic_from_history:
@@ -226,11 +241,17 @@ class LLMProvider:
         return None
 
     def _infer_intent(self, normalized_question: str) -> str:
-        if any(token in normalized_question for token in {"quem", "quando", "em que ano", "que ano", "qual"}):
+        if any(
+            token in normalized_question
+            for token in {"quem", "quando", "em que ano", "que ano", "qual"}
+        ):
             return "fact"
         if any(token in normalized_question for token in {"resuma", "resumo", "sintese"}):
             return "summary"
-        if any(token in normalized_question for token in {"aprofunde", "detalhe", "explique melhor", "continue"}):
+        if any(
+            token in normalized_question
+            for token in {"aprofunde", "detalhe", "explique melhor", "continue"}
+        ):
             return "deepen"
         return "explain"
 
@@ -244,5 +265,7 @@ class LLMProvider:
     @staticmethod
     def _normalize(value: str) -> str:
         normalized = unicodedata.normalize("NFD", value)
-        without_accents = "".join(char for char in normalized if unicodedata.category(char) != "Mn")
+        without_accents = "".join(
+            char for char in normalized if unicodedata.category(char) != "Mn"
+        )
         return without_accents.lower()

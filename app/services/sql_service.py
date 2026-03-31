@@ -21,7 +21,9 @@ logger = logging.getLogger(__name__)
 class SQLService:
     """Serviço para execução controlada de SQL."""
 
-    def __init__(self, sql_gateway: SQLGateway | None = None, llm_provider: LLMProvider | None = None) -> None:
+    def __init__(
+        self, sql_gateway: SQLGateway | None = None, llm_provider: LLMProvider | None = None
+    ) -> None:
         self.settings = get_settings()
         self.sql_gateway = sql_gateway or SQLGateway()
         self.llm_provider = llm_provider or LLMProvider()
@@ -78,7 +80,9 @@ class SQLService:
         # Regex: captura tabelas após FROM/JOIN
         detected_tables = {
             match.lower()
-            for match in re.findall(r"(?:from|join)\s+([a-zA-Z_][a-zA-Z0-9_]*)", query, re.IGNORECASE)
+            for match in re.findall(
+                r"(?:from|join)\s+([a-zA-Z_][a-zA-Z0-9_]*)", query, re.IGNORECASE
+            )
         }
 
         if not detected_tables:

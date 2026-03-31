@@ -167,7 +167,9 @@ class OrchestratorTests(unittest.TestCase):
 
     def test_provider_chess_fallback_handles_previous_champion_question(self) -> None:
         provider = LLMProvider(knowledge_provider=NoopKnowledgeProvider())
-        answer = provider.answer_general("Antes do Gukesh Dommaraju, quem era o campeão mundial de xadrez?")
+        answer = provider.answer_general(
+            "Antes do Gukesh Dommaraju, quem era o campeão mundial de xadrez?"
+        )
         self.assertIn("ding liren", answer.lower())
 
     def test_provider_realtime_fact_question_extracts_year(self) -> None:

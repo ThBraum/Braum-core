@@ -20,10 +20,6 @@ class ChatSendRequest(BaseModel):
     web_search_enabled: bool = False
 
 
-class DevTokenRequest(BaseModel):
-    user_id: str = Field(min_length=1)
-
-
 class ConversationMessageDTO(BaseModel):
     id: int
     role: str

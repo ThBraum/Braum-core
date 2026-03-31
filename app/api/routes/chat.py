@@ -3,7 +3,6 @@ from fastapi import APIRouter
 from app.domain.schemas import ChatRequest, ChatResponse
 from app.services.orchestrator import get_chat_orchestrator
 
-
 router = APIRouter()
 
 

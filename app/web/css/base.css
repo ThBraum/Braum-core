@@ -1,0 +1,32 @@
+:root {
+    --bg: #0b0f17;
+    --panel: #131a26;
+    --panel-soft: #171f2d;
+    --panel-hover: #1d2839;
+    --border: #263247;
+    --text: #e7edf7;
+    --muted: #9fb0c8;
+    --brand: #3b82f6;
+    --brand-2: #2563eb;
+    --danger: #ef4444;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    background: radial-gradient(1200px 500px at 50% -10%, #152136 0%, var(--bg) 55%);
+    color: var(--text);
+}

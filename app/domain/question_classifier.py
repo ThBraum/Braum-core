@@ -2,9 +2,9 @@
 Classificador de perguntas para determinar a estratégia de resposta otimizada.
 """
 
+import re
 from dataclasses import dataclass
 from enum import Enum
-import re
 
 
 class QuestionCategory(str, Enum):
@@ -193,7 +193,9 @@ class QuestionClassifier:
         import unicodedata
 
         normalized = unicodedata.normalize("NFD", text)
-        without_accents = "".join(char for char in normalized if unicodedata.category(char) != "Mn")
+        without_accents = "".join(
+            char for char in normalized if unicodedata.category(char) != "Mn"
+        )
         return without_accents.lower().strip()
 
     @classmethod

@@ -1,0 +1,99 @@
+.modal-input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #121b2a;
+    color: var(--text);
+    padding: 10px;
+    font-size: 14px;
+    min-height: 40px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.modal-input:focus {
+    outline: none;
+    border-color: var(--brand);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.modal-input.error {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.1);
+}
+
+.modal-input::placeholder {
+    color: var(--muted);
+}
+
+/* Input Wrapper */
+.input-wrapper {
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.input-label {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.required-star {
+    color: var(--danger);
+    margin-left: 2px;
+}
+
+/* Password Field */
+.password-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-container input {
+    width: 100%;
+    padding-right: 40px;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: color 0.2s;
+    width: 24px;
+    height: 24px;
+}
+
+.password-toggle:hover {
+    color: var(--text);
+}
+
+.password-toggle svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* Error Message */
+.error-message {
+    color: var(--danger);
+    font-size: 12px;
+    margin-left: 2px;
+    display: none;
+    min-height: 16px;
+}
+
+.error-message.show {
+    display: block;
+}
