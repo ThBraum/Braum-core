@@ -12,28 +12,56 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    app_name: str = Field(default="Braum Core API", validation_alias=AliasChoices("APP_NAME", "app_name"))
-    environment: str = Field(default="development", validation_alias=AliasChoices("APP_ENV", "environment"))
-    version: str = Field(default="0.1.0", validation_alias=AliasChoices("APP_VERSION", "app_version"))
+    app_name: str = Field(
+        default="Braum Core API", validation_alias=AliasChoices("APP_NAME", "app_name")
+    )
+    environment: str = Field(
+        default="development", validation_alias=AliasChoices("APP_ENV", "environment")
+    )
+    version: str = Field(
+        default="0.1.0", validation_alias=AliasChoices("APP_VERSION", "app_version")
+    )
     dev: bool = Field(default=False, validation_alias=AliasChoices("DEV_MODE", "DEV", "dev_mode"))
 
-    secret_key: str = Field(default="change-me", validation_alias=AliasChoices("SECRET_KEY", "secret_key"))
-    jwt_secret: str = Field(default="change-me", validation_alias=AliasChoices("JWT_SECRET", "SECRET_KEY", "jwt_secret"))
-    jwt_algorithm: str = Field(default="HS256", validation_alias=AliasChoices("JWT_ALGORITHM", "jwt_algorithm"))
+    secret_key: str = Field(
+        default="change-me", validation_alias=AliasChoices("SECRET_KEY", "secret_key")
+    )
+    jwt_secret: str = Field(
+        default="change-me",
+        validation_alias=AliasChoices("JWT_SECRET", "SECRET_KEY", "jwt_secret"),
+    )
+    jwt_algorithm: str = Field(
+        default="HS256", validation_alias=AliasChoices("JWT_ALGORITHM", "jwt_algorithm")
+    )
 
-    postgres_user: str = Field(default="postgres", validation_alias=AliasChoices("POSTGRES_USER", "postgres_user"))
-    postgres_password: str = Field(default="postgres", validation_alias=AliasChoices("POSTGRES_PASSWORD", "postgres_password"))
-    postgres_db: str = Field(default="braum", validation_alias=AliasChoices("POSTGRES_DB", "postgres_db"))
-    postgres_host: str = Field(default="localhost", validation_alias=AliasChoices("POSTGRES_HOST", "postgres_host"))
-    postgres_port: int = Field(default=5432, validation_alias=AliasChoices("POSTGRES_PORT", "postgres_port"))
+    postgres_user: str = Field(
+        default="postgres", validation_alias=AliasChoices("POSTGRES_USER", "postgres_user")
+    )
+    postgres_password: str = Field(
+        default="postgres", validation_alias=AliasChoices("POSTGRES_PASSWORD", "postgres_password")
+    )
+    postgres_db: str = Field(
+        default="braum", validation_alias=AliasChoices("POSTGRES_DB", "postgres_db")
+    )
+    postgres_host: str = Field(
+        default="localhost", validation_alias=AliasChoices("POSTGRES_HOST", "postgres_host")
+    )
+    postgres_port: int = Field(
+        default=5432, validation_alias=AliasChoices("POSTGRES_PORT", "postgres_port")
+    )
 
     database_url: str = Field(
         default="postgresql+psycopg://postgres:postgres@localhost:5432/braum",
         validation_alias=AliasChoices("DATABASE_URL", "database_url"),
     )
 
-    cors_localhost: bool = Field(default=False, validation_alias=AliasChoices("APP_DEBUG", "cors_localhost"))
-    free_general_questions: int = Field(default=10, validation_alias=AliasChoices("GUEST_SESSION_MAX_QUESTIONS", "FREE_GENERAL_QUESTIONS"))
+    cors_localhost: bool = Field(
+        default=False, validation_alias=AliasChoices("APP_DEBUG", "cors_localhost")
+    )
+    free_general_questions: int = Field(
+        default=10,
+        validation_alias=AliasChoices("GUEST_SESSION_MAX_QUESTIONS", "FREE_GENERAL_QUESTIONS"),
+    )
     allowed_sql_tables: str = Field(
         default="users,orders,products",
         validation_alias=AliasChoices("SQL_ALLOWED_TABLES", "ALLOWED_SQL_TABLES"),
@@ -44,15 +72,21 @@ class Settings(BaseSettings):
     )
     realtime_search_timeout_seconds: float = Field(
         default=1.8,
-        validation_alias=AliasChoices("REALTIME_SEARCH_TIMEOUT_SECONDS", "realtime_search_timeout_seconds"),
+        validation_alias=AliasChoices(
+            "REALTIME_SEARCH_TIMEOUT_SECONDS", "realtime_search_timeout_seconds"
+        ),
     )
     realtime_search_cache_ttl_seconds: int = Field(
         default=300,
-        validation_alias=AliasChoices("REALTIME_SEARCH_CACHE_TTL_SECONDS", "realtime_search_cache_ttl_seconds"),
+        validation_alias=AliasChoices(
+            "REALTIME_SEARCH_CACHE_TTL_SECONDS", "realtime_search_cache_ttl_seconds"
+        ),
     )
     realtime_search_max_sources: int = Field(
         default=3,
-        validation_alias=AliasChoices("REALTIME_SEARCH_MAX_SOURCES", "realtime_search_max_sources"),
+        validation_alias=AliasChoices(
+            "REALTIME_SEARCH_MAX_SOURCES", "realtime_search_max_sources"
+        ),
     )
 
     debug: bool = Field(default=False, validation_alias=AliasChoices("DEBUG", "debug"))

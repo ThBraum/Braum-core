@@ -1,16 +1,14 @@
 import json
 import unicodedata
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 from pathlib import Path
 from urllib.parse import quote_plus
 from uuid import uuid4
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
-from jose import jwt
 from pydantic import BaseModel
 from sqlalchemy import select
 
-from app.core.config import get_settings
 from app.core.security import decode_access_token
 from app.domain.schemas import ChatMode
 from app.domain.workspace_schemas import (
@@ -19,14 +17,12 @@ from app.domain.workspace_schemas import (
     ConversationCreateRequest,
     ConversationDTO,
     ConversationMessageDTO,
-    DevTokenRequest,
     FileDTO,
 )
 from app.infrastructure.db.database import SessionLocal
 from app.infrastructure.db.models import Conversation, ConversationMessage, UserFile
 from app.infrastructure.llm_provider import LLMProvider
 from app.services.general_answer_service import GeneralAnswerService
-
 
 router = APIRouter(prefix="/workspace", tags=["workspace"])
 
@@ -53,7 +49,9 @@ def _resolve_owner(client_id: str | None, access_token: str | None) -> tuple[str
         return str(payload["sub"]), True
 
     if not client_id:
-        raise HTTPException(status_code=400, detail="client_id é obrigatório para sessão não autenticada.")
+        raise HTTPException(
+            status_code=400, detail="client_id é obrigatório para sessão não autenticada."
+        )
 
     return f"guest:{client_id}", False
 
@@ -151,7 +149,9 @@ def _is_external_search_confirmation(message: str) -> bool:
     if "busca externa" in compact:
         return True
 
-    if len(compact.split()) <= 6 and any(marker in compact for marker in SEARCH_CONFIRMATION_MARKERS):
+    if len(compact.split()) <= 6 and any(
+        marker in compact for marker in SEARCH_CONFIRMATION_MARKERS
+    ):
         return True
 
     return False
@@ -177,7 +177,6 @@ def _generate_answer(
 ) -> tuple[str, bool, str | None, list[dict[str, str]], list[FileDTO]]:
     llm_provider = LLMProvider()
     general_answer_service = GeneralAnswerService()
-    settings = get_settings()
 
     with SessionLocal() as db:
         attached_files = db.scalars(
@@ -267,9 +266,18 @@ def _generate_answer(
                     context_chunks.append(excerpt)
                     sources.append({"file": item.original_name, "excerpt": excerpt[:220]})
                 else:
-                    sources.append({"file": item.original_name, "excerpt": "Arquivo disponível para consulta."})
+                    sources.append(
+                        {
+                            "file": item.original_name,
+                            "excerpt": "Arquivo disponível para consulta.",
+                        }
+                    )
 
-            context_text = "\n\n".join(context_chunks) if context_chunks else "Arquivos sem conteúdo textual extraível."
+            context_text = (
+                "\n\n".join(context_chunks)
+                if context_chunks
+                else "Arquivos sem conteúdo textual extraível."
+            )
             answer = llm_provider.answer_with_context(content, context_text)
             return (
                 answer,
@@ -315,19 +323,6 @@ def _generate_answer(
         )
 
 
-@router.post("/auth/dev-token")
-def create_dev_token(request: DevTokenRequest) -> dict[str, str]:
-    settings = get_settings()
-    now = datetime.now(timezone.utc)
-    payload = {
-        "sub": request.user_id,
-        "iat": int(now.timestamp()),
-        "exp": int((now + timedelta(hours=12)).timestamp()),
-    }
-    token = jwt.encode(payload, settings.jwt_secret, algorithm=settings.jwt_algorithm)
-    return {"access_token": token, "token_type": "bearer"}
-
-
 @router.post("/conversations", response_model=ConversationDTO)
 def create_conversation(request: ConversationCreateRequest) -> ConversationDTO:
     owner_id, _ = _resolve_owner(request.client_id, request.access_token)
@@ -347,7 +342,9 @@ def create_conversation(request: ConversationCreateRequest) -> ConversationDTO:
 
 
 @router.get("/conversations", response_model=list[ConversationDTO])
-def list_conversations(client_id: str | None = None, access_token: str | None = None) -> list[ConversationDTO]:
+def list_conversations(
+    client_id: str | None = None, access_token: str | None = None
+) -> list[ConversationDTO]:
     owner_id, _ = _resolve_owner(client_id, access_token)
     with SessionLocal() as db:
         rows = db.scalars(
@@ -358,7 +355,9 @@ def list_conversations(client_id: str | None = None, access_token: str | None = 
         return [_to_conversation_dto(item) for item in rows]
 
 
-@router.get("/conversations/{conversation_id}/messages", response_model=list[ConversationMessageDTO])
+@router.get(
+    "/conversations/{conversation_id}/messages", response_model=list[ConversationMessageDTO]
+)
 def get_conversation_messages(
     conversation_id: str,
     client_id: str | None = None,
@@ -387,6 +386,7 @@ def get_conversation_messages(
             )
             for item in messages
         ]
+
 
 @router.patch("/conversations/{conversation_id}", response_model=ConversationDTO)
 def update_conversation(
@@ -500,8 +500,10 @@ async def upload_file(
 ) -> FileDTO:
     owner_id, authenticated = _resolve_owner(client_id, access_token)
 
-    if mode in {ChatMode.RAG, ChatMode.SQL} and not authenticated:
-        raise HTTPException(status_code=401, detail="Autenticação obrigatória para upload em RAG/SQL.")
+    if not authenticated:
+        raise HTTPException(
+            status_code=401, detail="Autenticação obrigatória para adicionar fontes internas."
+        )
 
     with SessionLocal() as db:
         conversation = db.get(Conversation, conversation_id)
@@ -543,7 +545,11 @@ async def upload_file(
 
 @router.get("/files/documents", response_model=list[FileDTO])
 def list_documents(client_id: str | None = None, access_token: str | None = None) -> list[FileDTO]:
-    owner_id, _ = _resolve_owner(client_id, access_token)
+    owner_id, authenticated = _resolve_owner(client_id, access_token)
+    if not authenticated:
+        raise HTTPException(
+            status_code=401, detail="Autenticação obrigatória para listar fontes internas."
+        )
 
     with SessionLocal() as db:
         rows = db.scalars(
@@ -557,7 +563,11 @@ def list_documents(client_id: str | None = None, access_token: str | None = None
 
 @router.get("/files/tables", response_model=list[FileDTO])
 def list_tables(client_id: str | None = None, access_token: str | None = None) -> list[FileDTO]:
-    owner_id, _ = _resolve_owner(client_id, access_token)
+    owner_id, authenticated = _resolve_owner(client_id, access_token)
+    if not authenticated:
+        raise HTTPException(
+            status_code=401, detail="Autenticação obrigatória para listar fontes internas."
+        )
 
     with SessionLocal() as db:
         rows = db.scalars(

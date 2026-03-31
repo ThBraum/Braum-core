@@ -7,8 +7,8 @@ Usa classificação de perguntas para decidir entre:
 - Explicação estruturada (didática)
 """
 
-import logging
 import json
+import logging
 import re
 from dataclasses import dataclass
 from urllib.request import Request, urlopen
@@ -81,7 +81,9 @@ class GeneralAnswerService:
                 return result
 
         if classification.category == QuestionCategory.ECONOMIC_INDICATOR:
-            result = self._handle_economic_indicator(question, classification, conversation_history)
+            result = self._handle_economic_indicator(
+                question, classification, conversation_history
+            )
             if result:
                 return result
 
@@ -110,14 +112,21 @@ class GeneralAnswerService:
         if knowledge is None:
             return None
 
-        sources = [{"title": s.title, "url": s.url, "tier": s.tier, "score": s.score} for s in knowledge.sources]
+        sources = [
+            {"title": s.title, "url": s.url, "tier": s.tier, "score": s.score}
+            for s in knowledge.sources
+        ]
         if not sources:
             return None
 
         direct_line = ""
         lower_q = question.lower()
         lower_summary = knowledge.summary.lower()
-        if "estado" in lower_q and "brasil" in lower_q and ("26 estados" in lower_summary or "distrito federal" in lower_summary):
+        if (
+            "estado" in lower_q
+            and "brasil" in lower_q
+            and ("26 estados" in lower_summary or "distrito federal" in lower_summary)
+        ):
             direct_line = "O Brasil tem 26 estados e 1 Distrito Federal.\n\n"
 
         answer = (
@@ -168,13 +177,15 @@ class GeneralAnswerService:
 
         logger.info(f"realtime_lookup_success: sources_count={len(knowledge.sources)}")
 
-        sources = [{"title": s.title, "url": s.url, "tier": s.tier, "score": s.score} for s in knowledge.sources]
+        sources = [
+            {"title": s.title, "url": s.url, "tier": s.tier, "score": s.score}
+            for s in knowledge.sources
+        ]
 
         answer = (
             f"Com base em busca em tempo real:\n\n"
             f"{knowledge.summary}\n\n"
-            f"Fontes:\n"
-            + "\n".join(f"- {s['title']} [{s['tier']}]: {s['url']}" for s in sources)
+            f"Fontes:\n" + "\n".join(f"- {s['title']} [{s['tier']}]: {s['url']}" for s in sources)
         )
 
         return GeneralAnswerResult(
@@ -199,14 +210,21 @@ class GeneralAnswerService:
         if pib_value_result is not None:
             return pib_value_result
 
-        knowledge = self.knowledge_provider.lookup(question, priority_sources=classification.priority_sources)
+        knowledge = self.knowledge_provider.lookup(
+            question, priority_sources=classification.priority_sources
+        )
         if knowledge is None:
             logger.warning(f"economic_lookup_failed: question={question}")
             return None
 
-        logger.info(f"economic_lookup_success: top_source={knowledge.sources[0].tier if knowledge.sources else 'none'}")
+        logger.info(
+            f"economic_lookup_success: top_source={knowledge.sources[0].tier if knowledge.sources else 'none'}"
+        )
 
-        sources = [{"title": s.title, "url": s.url, "tier": s.tier, "score": s.score} for s in knowledge.sources]
+        sources = [
+            {"title": s.title, "url": s.url, "tier": s.tier, "score": s.score}
+            for s in knowledge.sources
+        ]
 
         answer = (
             f"Baseado em dados econômicos em tempo real:\n\n"
@@ -328,7 +346,7 @@ class GeneralAnswerService:
 
     def _handle_explain(self, question: str, classification) -> GeneralAnswerResult | None:
         """Trata perguntas que pedem explicação.
-        
+
         Se classification.use_realtime=True, tenta busca em tempo real primeiro.
         """
         # Se foi classificado com use_realtime=True, tenta buscar antes de retornar template
@@ -340,20 +358,20 @@ class GeneralAnswerService:
                     {"title": s.title, "url": s.url, "tier": s.tier, "score": s.score}
                     for s in knowledge.sources
                 ]
-                
+
                 answer = (
                     f"{knowledge.summary}\n\n"
                     f"Fonte: {sources[0]['title']} ({sources[0]['tier']})\n"
                     f"Link: {sources[0]['url']}"
                 )
-                
+
                 return GeneralAnswerResult(
                     answer=answer,
                     used_realtime=True,
                     category=classification.category,
                     sources=sources,
                 )
-        
+
         # Fallback: resposta estruturada (quando não tem realtime ou falhou)
         answer = (
             f"Vou explicar '{question}':\n\n"

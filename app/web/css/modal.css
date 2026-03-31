@@ -1,0 +1,112 @@
+@keyframes flip {
+    from {
+        opacity: 0.3;
+        transform: rotateY(180deg);
+    }
+
+    to {
+        opacity: 1;
+        transform: rotateY(0);
+    }
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    75% {
+        transform: translateX(5px);
+    }
+}
+
+/* Modal Container */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 6, 23, 0.72);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+}
+
+.modal-card {
+    width: min(520px, calc(100% - 24px));
+    border: 1px solid var(--border);
+    background: #0f172a;
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modal-card h3 {
+    margin: 0 0 8px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.sources-card {
+    width: min(880px, calc(100% - 24px));
+}
+
+/* Modal Actions */
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+/* Tabs */
+.auth-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.tab-btn {
+    border: 1px solid #364a6b;
+    border-radius: 10px;
+    background: #15223a;
+    color: #d7e4fb;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background 0.3s, border-color 0.3s, color 0.3s;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.tab-btn:hover {
+    background: #1d2e4d;
+}
+
+.tab-btn.active {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #fff;
+}
+
+/* Auth Content */
+.auth-content {
+    animation: flip 0.4s ease-out;
+    perspective: 1000px;
+}
+
+.auth-content.error {
+    animation: shake 0.4s ease-in-out;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}

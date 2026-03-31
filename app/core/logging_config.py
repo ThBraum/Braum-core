@@ -80,8 +80,10 @@ def setup_logging() -> None:
     # Handler para console
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(logging.DEBUG if settings.debug else logging.INFO)
-    console_formatter = JSONFormatter() if settings.debug else logging.Formatter(
-        "[%(levelname)s] %(name)s: %(message)s"
+    console_formatter = (
+        JSONFormatter()
+        if settings.debug
+        else logging.Formatter("[%(levelname)s] %(name)s: %(message)s")
     )
     console_handler.setFormatter(console_formatter)
     console_handler.addFilter(SensitiveDataFilter())

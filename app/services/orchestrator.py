@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class ChatOrchestrator:
     """Orquestrador principal que coordena os 3 modos de chat.
-    
+
     Responsabilidades:
     - Roteamento por modo (GENERAL, RAG, SQL)
     - Validação de acesso (login, limites)
@@ -101,7 +101,9 @@ class ChatOrchestrator:
                     answer="Não encontrei documentos relevantes para sua pergunta.",
                 )
 
-            answer = self.llm_provider.answer_with_context(request.question, rag_result.context_text)
+            answer = self.llm_provider.answer_with_context(
+                request.question, rag_result.context_text
+            )
 
             sources = [
                 {

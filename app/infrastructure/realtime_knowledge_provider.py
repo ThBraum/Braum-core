@@ -40,7 +40,9 @@ class RealtimeKnowledgeProvider:
         self.cache_ttl_seconds = max(60, int(self.settings.realtime_search_cache_ttl_seconds))
         self._cache: dict[str, tuple[datetime, RealtimeKnowledge]] = {}
 
-    def lookup(self, query: str, priority_sources: list[str] | None = None) -> RealtimeKnowledge | None:
+    def lookup(
+        self, query: str, priority_sources: list[str] | None = None
+    ) -> RealtimeKnowledge | None:
         """
         Busca conhecimento em tempo real.
 
@@ -64,7 +66,9 @@ class RealtimeKnowledgeProvider:
         if not candidates:
             return None
 
-        ranked = self._rank_candidates(cleaned_query, candidates, priority_sources=priority_sources)
+        ranked = self._rank_candidates(
+            cleaned_query, candidates, priority_sources=priority_sources
+        )
         resolved = self._resolve_best_sources(cleaned_query, ranked)
         if resolved is not None:
             self._set_cache(cleaned_query, resolved)
@@ -87,7 +91,7 @@ class RealtimeKnowledgeProvider:
     def _discover_wikipedia_candidate(self, query: str) -> SourceCandidate | None:
         """
         Busca Wikipedia com fallback para simplificação de query.
-        
+
         Estratégia:
         1. Extrai palavras-chave principais (remove stop words)
         2. Tenta query original
@@ -96,13 +100,47 @@ class RealtimeKnowledgeProvider:
         """
         # Stop words: palavras genéricas que não ajudam na busca
         stop_words = {
-            "qual", "quais", "que", "o", "a", "de", "da", "do", "das", "dos",
-            "e", "é", "são", "em", "para", "com", "por", "por que", "foi",
-            "como", "onde", "quando", "quem", "explique", "me", "nos",
-            "cores", "tipo", "tipos", "forma", "formas", "quero", "saber",
-            "soma", "bens", "servico", "servicos", "produzidos", "brasil",
+            "qual",
+            "quais",
+            "que",
+            "o",
+            "a",
+            "de",
+            "da",
+            "do",
+            "das",
+            "dos",
+            "e",
+            "é",
+            "são",
+            "em",
+            "para",
+            "com",
+            "por",
+            "por que",
+            "foi",
+            "como",
+            "onde",
+            "quando",
+            "quem",
+            "explique",
+            "me",
+            "nos",
+            "cores",
+            "tipo",
+            "tipos",
+            "forma",
+            "formas",
+            "quero",
+            "saber",
+            "soma",
+            "bens",
+            "servico",
+            "servicos",
+            "produzidos",
+            "brasil",
         }
-        
+
         # Keywords econômicos e suas expansões
         expansions = {
             "pib": "Produto Interno Bruto",
@@ -111,45 +149,44 @@ class RealtimeKnowledgeProvider:
             "dolar": "dólar",
             "inflacao": "inflação",
         }
-        
+
         # Extrai keywords principais (remove stop words e acentos para comparação)
         def extract_keywords(text: str) -> list[str]:
             normalized = unicodedata.normalize("NFD", text.lower())
             without_accents = "".join(c for c in normalized if unicodedata.category(c) != "Mn")
-            
+
             words = without_accents.split()
-            return [w.strip(".,!?:;\"'") for w in words 
-                    if len(w) > 2 and w not in stop_words]
-        
+            return [w.strip(".,!?:;\"'") for w in words if len(w) > 2 and w not in stop_words]
+
         keywords = extract_keywords(query)
-        
+
         # Sort keywords por tamanho (maiores/mais específicas primeiro)
         keywords.sort(key=len, reverse=True)
-        
+
         # Build search queries com diferentes estratégias
         search_queries = []
-        
+
         # 1. Query original (se não for muito longa)
         if len(query) <= 50:
             search_queries.append(query)
-        
+
         # 2. Todos os keywords juntos
         if keywords:
             search_queries.append(" ".join(keywords))
-        
+
         # 3. Keywords individuais (maiores primeiro)
         search_queries.extend(keywords)
-        
+
         # 4. Expansões para termos econômicos
         for short, long in expansions.items():
             if short in " ".join(keywords):
                 search_queries.append(f"{long} Brasil")
                 search_queries.append(f"{long}")
                 break
-        
+
         # Remove duplicatas preservando ordem
         search_queries = list(dict.fromkeys(search_queries))
-        
+
         best_candidate: SourceCandidate | None = None
         best_score = -1.0
 
@@ -157,7 +194,7 @@ class RealtimeKnowledgeProvider:
             for search_query in search_queries:
                 if not search_query or len(search_query) > 50:
                     continue
-                    
+
                 opensearch_url = (
                     f"https://{language}.wikipedia.org/w/api.php"
                     f"?action=opensearch&search={quote(search_query)}&limit=5&namespace=0&format=json"
@@ -199,8 +236,7 @@ class RealtimeKnowledgeProvider:
 
     def _discover_duckduckgo_candidates(self, query: str) -> list[SourceCandidate]:
         url = (
-            "https://api.duckduckgo.com/"
-            f"?q={quote(query)}&format=json&no_redirect=1&no_html=1"
+            "https://api.duckduckgo.com/" f"?q={quote(query)}&format=json&no_redirect=1&no_html=1"
         )
         payload = self._fetch_json(url)
         if not isinstance(payload, dict):
@@ -319,9 +355,30 @@ class RealtimeKnowledgeProvider:
 
     def _tokenize(self, text: str) -> set[str]:
         stop = {
-            "qual", "quais", "que", "de", "da", "do", "das", "dos", "e", "em",
-            "para", "com", "por", "como", "onde", "quando", "quem", "sobre",
-            "quero", "saber", "foi", "ano", "atual", "hoje",
+            "qual",
+            "quais",
+            "que",
+            "de",
+            "da",
+            "do",
+            "das",
+            "dos",
+            "e",
+            "em",
+            "para",
+            "com",
+            "por",
+            "como",
+            "onde",
+            "quando",
+            "quem",
+            "sobre",
+            "quero",
+            "saber",
+            "foi",
+            "ano",
+            "atual",
+            "hoje",
         }
         clean = self._normalize_text(text)
         words = re.findall(r"[a-z0-9]+", clean)
@@ -343,7 +400,9 @@ class RealtimeKnowledgeProvider:
         t_norm = self._normalize_text(title)
 
         has_pib_intent = any(token in q_norm for token in ("pib", "produto interno bruto", "gdp"))
-        if has_pib_intent and any(token in t_norm for token in ("pib", "produto interno bruto", "gdp")):
+        if has_pib_intent and any(
+            token in t_norm for token in ("pib", "produto interno bruto", "gdp")
+        ):
             overlap_score += 0.35
 
         if has_pib_intent and "servico publico" in t_norm:
@@ -366,7 +425,7 @@ class RealtimeKnowledgeProvider:
                 continue
 
             summary, key_points = extracted
-            
+
             if not best_summary:
                 best_summary = summary
                 best_points = key_points
@@ -403,7 +462,7 @@ class RealtimeKnowledgeProvider:
             # Extrai o título já URL-encoded
             title = candidate.url.rsplit("/", 1)[-1]
             # NÃO fazer quote() novamente - já está encoded!
-            
+
             # Detecta linguagem corretamente
             if "pt.wikipedia" in normalized_url:
                 language = "pt"
@@ -412,17 +471,17 @@ class RealtimeKnowledgeProvider:
             else:
                 # Default português
                 language = "pt"
-            
+
             summary_url = f"https://{language}.wikipedia.org/api/rest_v1/page/summary/{title}"
             payload = self._fetch_json(summary_url)
-            
+
             if not isinstance(payload, dict):
                 return None
-            
+
             summary = str(payload.get("extract") or "").strip()
             if not summary:
                 return None
-            
+
             return (summary, self._extract_key_points(summary))
 
         # Fallback genérico: tenta baixar HTML e extrair texto.

@@ -67,11 +67,15 @@ A aplicação agora expõe uma interface web responsiva em `/` com:
 
 - `general`: funciona sem autenticação.
 - `rag` e `sql`: ao tentar usar o ícone de upload sem login, a UI solicita autenticação.
-- A autenticação demo pode ser feita pela barra lateral (gera JWT local via endpoint de desenvolvimento).
+- A autenticação é feita no botão `Entrar` no canto superior direito (login/registro).
+- Ao clicar no usuário logado, a UI abre a tela `Minha conta` com dados de `/api/v1/auth/me`.
+- A tela `Fontes` exige autenticação e sempre lista arquivos vinculados ao usuário autenticado.
 
 ### Endpoints principais da nova experiência
 
-- `POST /api/v1/workspace/auth/dev-token`
+- `POST /api/v1/auth/register`
+- `POST /api/v1/auth/login`
+- `GET /api/v1/auth/me`
 - `POST /api/v1/workspace/conversations`
 - `GET /api/v1/workspace/conversations`
 - `PATCH /api/v1/workspace/conversations/{conversation_id}`
